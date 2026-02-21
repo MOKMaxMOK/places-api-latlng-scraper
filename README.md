@@ -1,4 +1,4 @@
-﻿# places-api-latlng-scraper
+
 
 # Google Places Batch Geocoder 🌍
 
@@ -53,5 +53,6 @@ effect:
 
 automatically create and save to location_lat_long.json
 <img width="1250" height="928" alt="image" src="https://github.com/user-attachments/assets/f27abc10-1a52-4737-a189-e323000d252b" />
+
 
 
