@@ -1,0 +1,18 @@
+[
+  {
+    "name": "white house",
+    "search_query": "white house Hong Kong",
+    "google_address": "White House, Sai Kung, Hong Kong",
+    "lat": 22.381988999999997,
+    "lng": 114.26956969999999,
+    "place_id": "ChIJa7GX8L0FBDQRNgp75kHpzRw"
+  },
+  {
+    "name": "HK BOC TOWER",
+    "search_query": "HK BOC TOWER Hong Kong",
+    "google_address": "1 Garden Rd, Central, Hong Kong",
+    "lat": 22.2793043,
+    "lng": 114.16149310000002,
+    "place_id": "ChIJAyU31GUABDQRW4dO0qcbxmY"
+  }
+]

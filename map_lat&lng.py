@@ -4,29 +4,44 @@ import time
 import os
 
 # ================= CONFIGURATION =================
-# ⚠️ WARNING: Do not commit your actual API key to GitHub!
-# Replace the string below with your actual Google Maps API Key.
-# Replace the string below with your actual Google Maps API Key.
-# Replace the string below with your actual Google Maps API Key.
-API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"
-# Replace the string below with your actual Google Maps API Key.
-# Replace the string below with your actual Google Maps API Key.
-# Replace the string below with your actual Google Maps API Key.
 
+# ⚠️ ============================================ ⚠️
+# ⚠️  Replace the key below with your own API Key  ⚠️
+# ⚠️ ============================================ ⚠️
+API_KEY = "your key"
+# ⚠️ ============================================ ⚠️
+# ⚠️  Replace the key above with your own API Key  ⚠️
+# ⚠️ ============================================ ⚠️
 
-
-# Default output file name
 OUTPUT_FILE = "locations_lat_long.json"
 
-# List of locations to query
-# Format: {"name": "Display Name", "query": "Search query (Name + Address recommended for accuracy)"}
+# Optional: Set a default city/region to improve search accuracy.
+# If your locations are from multiple cities, leave this empty ("") and
+# include the city name directly in each spot's "name" or "address" field.
+TARGET_CITY = " "  # e.g. "Hong Kong", "Tokyo", "London" or leave empty ""
+
+# ▼▼▼ ADD YOUR LOCATIONS HERE ▼▼▼
 spots_data = [
-    # Example:
-    # {"name": "Central-Mid-Levels Escalator", "query": "Central-Mid-Levels Escalator Jubilee Street Central"},
+    # Format 1 — Name only (script will append TARGET_CITY automatically)
+    {"name": " "},
+
+    # Format 2 — Name + Address (recommended when address is available, more precise)
+    {"name": " ", "address": " "},
 ]
-
-
+# ▲▲▲ DONE. Run the script after filling in the list. ▲▲▲
 # ==================================================
+
+def build_query(spot):
+    """
+    Builds the search query string from name, optional address, and optional TARGET_CITY.
+    """
+    parts = [spot.get("name", "")]
+    if spot.get("address"):
+        parts.append(spot["address"])
+    if TARGET_CITY:
+        parts.append(TARGET_CITY)
+    return " ".join(parts)
+
 
 def search_place(spot):
     """
@@ -34,11 +49,8 @@ def search_place(spot):
     """
     url = "https://places.googleapis.com/v1/places:searchText"
 
-    # Using the "query" field which combines name and address for better accuracy
-    payload = {
-        "textQuery": spot["query"]
-    }
-
+    search_query = build_query(spot)
+    payload = {"textQuery": search_query}
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": API_KEY,
@@ -51,38 +63,40 @@ def search_place(spot):
 
         if "places" in data and len(data["places"]) > 0:
             place = data["places"][0]
-            lat = place["location"]["latitude"]
-            lng = place["location"]["longitude"]
-
             return {
-                "name": spot["name"],  # The original name you want to display
-                "search_query": spot["query"],
-                "google_address": place.get("formattedAddress"),  # The actual address returned by Google Maps
-                "lat": lat,
-                "lng": lng,
+                "name": spot.get("name"),
+                "search_query": search_query,
+                "google_address": place.get("formattedAddress"),
+                "lat": place["location"]["latitude"],
+                "lng": place["location"]["longitude"],
                 "place_id": place["id"],
                 "error": None
             }
         else:
-            return {"name": spot["name"], "lat": 0, "lng": 0, "error": "Not Found"}
+            return {"name": spot.get("name"), "lat": 0, "lng": 0, "error": "Not Found"}
 
     except Exception as e:
-        return {"name": spot["name"], "lat": 0, "lng": 0, "error": str(e)}
+        return {"name": spot.get("name"), "lat": 0, "lng": 0, "error": str(e)}
 
 
 def main():
-    # Prevent execution if the API key is not set
     if API_KEY == "YOUR_GOOGLE_MAPS_API_KEY" or not API_KEY:
         print("❌ ERROR: Please set your Google Maps API Key in the API_KEY variable!")
         return
 
-    # Prevent execution if the data list is empty
     if not spots_data:
-        print("⚠️ WARNING: The 'spots_data' list is empty. Please add locations to search.")
+        print("⚠️  WARNING: The 'spots_data' list is empty. Please add locations to search.")
         return
 
+    if not TARGET_CITY:
+        print("💡 TIP: TARGET_CITY is not set.")
+        print("   To avoid matching wrong locations, include city name in each entry.")
+        print('   e.g. {"name": "Eiffel Tower", "address": "Paris"}')
+        print("-" * 50)
+
     results = []
-    print(f"🚀 Starting to query {len(spots_data)} locations...")
+    city_label = f" in {TARGET_CITY}" if TARGET_CITY else ""
+    print(f"🚀 Starting to query {len(spots_data)} location(s){city_label}...")
     print("-" * 50)
 
     for i, spot in enumerate(spots_data):
@@ -94,16 +108,12 @@ def main():
         else:
             print(f"❌ Failed (Reason: {result.get('error')})")
 
-        # Remove the error key before saving to JSON to keep the output clean
         if "error" in result:
             del result["error"]
 
         results.append(result)
-
-        # Short delay to prevent hitting API rate limits
         time.sleep(0.1)
 
-    # Save results to a JSON file
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
