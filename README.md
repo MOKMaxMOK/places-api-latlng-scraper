@@ -9,7 +9,7 @@ A simple and efficient Python script designed to batch query the [Google Places 
 - **Batch Processing:** Processes multiple locations automatically with built-in delay to respect API rate limits.
 - **Clean Output:** Exports structured data to a JSON file, ready for integration into frontend maps (e.g., Vue.js, MapLibre, Leaflet).
 - **Error Handling:** Gracefully handles "Not Found" locations or API errors without crashing the script.
-
+- **Almost free for small projects:** You can search 11,000 locations for free each month.
 
 ## 🔑 How to get a Google Maps API Key
 
@@ -53,4 +53,5 @@ effect:
 
 automatically create and save to location_lat_long.json
 <img width="1250" height="928" alt="image" src="https://github.com/user-attachments/assets/f27abc10-1a52-4737-a189-e323000d252b" />
+
 
